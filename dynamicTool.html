@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/jquery-ui.min.css" />
+    <link rel="stylesheet" href="css/all.css" />
+    <link rel="stylesheet" href="css/dynamicTool.css" />
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/data.json"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+   
+    <script>
+      $(document).ready(() => {
+      
+        $('.selectField').select2();
+
+        // $("#paper").height(1240);
+        // $("#paper").width(800);
+        // $("#paperW").val('800');
+        // $("#paperH").val('1240');
+
+        $("#setBlockHeight,#textSetting,#commonSetting,#lineSetting,#recSetting,#imageSetting").hide();
+
+        // var data = new Object();
+        // setPaper();
+        // data.layout = [];
+        parseData(data);
+
+
+
+        function parseData(data){
+          $("#paper").height(data.h);
+          $("#paper").width(data.w);
+          $("#paperW").val(data.w);
+          $("#paperH").val(data.h);
+          $("#mainDs").val(data.mainDs);
+
+          data.layout.forEach((ele)=>{
+            var tempDiv = $(`<li data-order="${ele.order}" data-name="${ele.type}" class="tempDiv ui-draggable-dragging ui-droppable" style="width: ${data.w}px; height: ${ele.height}px; position: relative; z-index: 10; left: 0px; top: 0px;" data-uuid="${ele.uuid}"><p class="m-0 text-black-50">${getTempName(ele.type)}</p></li>`);
+            $("#paper").append(tempDiv);
+            tempClick();
+            ele.children.forEach((e)=>{
+              var type = e.type;
+              switch (type) {
+                case 'label':
+                case 'textField':
+                  buildLabel(ele,tempDiv,e);
+                  break;
+                case 'line':
+                  buildLine(ele,tempDiv,e);
+                  break;
+                case 'rect':
+                  buildRect(ele,tempDiv,e);
+                  break;
+                case 'image':
+                  ///TODO
+                  break;
+              }
+
+            });
+            widgetDrop();
+          });
+
+
+
+        }
+
+        function getTempName(temp){
+          switch (temp) {
+            case 'title':
+              return 'Title';
+              break;
+            case 'detail':
+              return 'Detail'
+              break;
+            case 'summary':
+              return 'Summary';
+              break;
+            case 'pageHeader':
+              return 'Page Header';
+              break;
+            case 'pageFooter':
+              return 'Page Footer';
+              break;
+            case 'columnHeader':
+              return 'Column Header';
+              break;
+            case 'columnFooter':
+              return 'Column Footer';
+              break;
+          }
+        }
+
+        function buildLabel(parent,parentDiv,w){
+          var label = $(`<div class="widgetText solid ui-draggable-dragging ui-draggable ui-draggable-handle" data-name="${w.type}" data-type="${w.type.replace(w.type[0],w.type[0].toUpperCase())}" data-border="${w.border}" data-borderid="${w.borderId}" data-fontsize="${w.fontSize}" 
+          style="position: absolute; z-index: 20; left: ${w.x}px; top: ${w.y}px;" data-uuid="${w.uuid}" data-parent="${parent.uuid}"><p class="m-0 w-100" style="font-family:${getFont(w.fontName)};font-weight:${w.isBold=='Y' ? 700 : 400}; white-space: pre; font-size:${w.fontSize};
+          text-align:${getHalign(w.hAlign)};color:${w.fontColor};">${w.text}</p></div>`);
+          w.borderId?.split(',').forEach((e)=>{
+            label.addClass(e);
+          });
+          label.css({
+            'width':`${w.w}px`,
+            'height':`${w.h}px`,
+            'align-items':`${getValign(w.vAlign)}`,
+          })
+          parentDiv.append(label);
+          clickLabel();
+          setDrag(parent.uuid,label);
+        }
+
+        function buildLine(parent,parentDiv,w){
+          var line = $(`<div class="widgetLine ui-draggable-dragging ui-draggable ui-draggable-handle" data-name="line" data-type="Line" data-ltype="${w.lineStyle}" data-rotate="${w.rotate}" style="position: absolute; z-index: 20; left: ${w.x}px; top: ${w.y}px;" data-uuid="${w.uuid}" data-parent="${parent.uuid}"><hr></div>`);
+          line.addClass(w.rotate);
+          line.css({
+              'width':`${w.w}px`,
+              'height':`${w.h}px`,
+            });
+          if(w.rotate == 'rotateH'){
+            line.find('hr').css({
+              "border-top-color":`${w.color}`,
+              "border-top-style":`${w.lineStyle.replace(w.lineStyle[0],w.lineStyle[0].toLowerCase())}`,
+              "border-top-width":`${w.h}px`,
+              "border-right":"0",
+            });
+          }else{
+            line.find('hr').css({
+              "border-right-color":`${w.color}`,
+              "border-right-style":`${w.lineStyle.replace(w.lineStyle[0],w.lineStyle[0].toLowerCase())}`,
+              "border-right-width":`${w.w}px`,
+              "border-top":"0",
+            });
+          }
+          parentDiv.append(line);
+          clickLine();
+          setDrag(parent.uuid,line);
+        }
+
+        function buildRect(parent,parentDiv,w){
+          var rect = $(`<div class="widgetRect ui-draggable-dragging ui-draggable ui-draggable-handle" data-name="rect" data-type="Rect" style="position: absolute; z-index: 20; left: ${w.x}px; top: ${w.y}px;" data-uuid="${w.uuid}" data-parent="${parent.uuid}"></div>`);
+          rect.css({
+            'width':`${w.w}px`,
+            'height':`${w.h}px`,
+            'background-color':`${w.color}`,
+          });
+          parentDiv.append(rect);
+          clickRect();
+          setDrag(parent.uuid,rect);
+        }
+
+        function getFont(val){
+          switch (val) {
+            case '0':
+              return 'MingLiU';
+              break;
+            case '1':
+              return '標楷體';
+              break;
+          }
+        }
+
+        function getValign(val){
+          switch (val) {
+            case '0':
+              return 'center';
+              break;
+            case '1':
+              return 'start';
+              break;
+            case '2':
+              return 'end';
+              break;
+          }
+        }
+
+        function getHalign(val){
+          switch (val) {
+            case '0':
+              return 'center';
+              break;
+            case '1':
+              return 'right';
+              break;
+            case '2':
+              return 'left';
+              break;
+          }
+        }
+
+
+        function setPaper(){
+          data.mainDs = $("#mainDs").val();
+          data.w = $("#paperW").val();
+          data.h = $("#paperH").val();
+        }
+
+        function setBlock(ui){
+          var o = new Object();
+          o.type = ui.attr('data-name');
+          o.height = ui.outerHeight().toString();
+          o.uuid = ui.attr('data-uuid');
+          o.order = ui.attr('data-order');
+          o.children = [];
+          data.layout.push(o);
+          data.layout.sort(function (a, b) {
+            return (
+              parseInt(a.order) - parseInt(b.order)
+            );
+          });
+        }
+
+        function updateBlock(uuid){
+          data.layout.forEach((ele) => {
+            if (ele.uuid == uuid) {
+              ele.height = $("#tempH").val();
+            }  
+          })
+        }
+
+        function removeBlock(uuid){
+          var ele = data.layout.find(element => element.uuid == uuid);
+          data.layout.splice(data.layout.indexOf(ele),1);
+        }
+
+        function removeWidget(parent,ui){
+          var ele = data.layout.find(element => element.uuid == parent);
+          var child = ele.children.find(element => element.uuid == ui);
+          ele.children.splice(ele.children.indexOf(child),1);
+          console.log(JSON.stringify(data));
+        }
+
+        function setTemplate(parent,ui,update = false){
+          switch (ui.data('name')) {
+            case 'label':
+            case 'textField':
+              setLabel(parent,ui,update);
+              break;
+            case 'line':
+              setLine(parent,ui,update);
+              break;
+            case 'rect':
+              setRect(parent,ui,update);
+              break;
+          }
+        }
+
+        function setLabel(parent,ui,update = false){
+          var o;
+          var p = data.layout.find(element => element.uuid == parent);
+          if(update){
+            o = p.children.find(ele => ele.uuid == ui.data('uuid'));
+          }else{
+            o = new Object();
+          }
+          o.uuid = ui.attr('data-uuid');
+          o.type = ui.attr('data-name');
+          o.x = ui.position().left.toString();
+          o.y = ui.position().top.toString();
+          o.w = ui.outerWidth().toString();
+          o.h = ui.outerHeight().toString();
+          o.text = ui.find("p").html().replace(RegExp("<br>","g"),"\r\n");
+          o.fontSize = ui.attr('data-fontsize');
+          o.vAlign = getVal(ui.css("align-items"));
+          o.hAlign = getVal(ui.find("p").css("text-align"));
+          o.fontName = getVal(ui.find("p").css("font-family"));
+          o.fontColor = rgb2hex(ui.find("p").css("color"));
+          o.borderId = ui.attr('data-borderid');
+          o.isBold = ui.find("p").css("font-weight") == '400' ? 'N' : 'Y';
+          o.border = ui.attr('data-border');
+          
+          console.log(JSON.stringify(data));
+          if(update) return;
+          p.children.push(o);
+          console.log(JSON.stringify(data));
+        }
+
+        function setLine(parent,ui,update = false){
+          var o;
+          var p = data.layout.find(element => element.uuid == parent);
+          if(update){
+            o = p.children.find(ele => ele.uuid == ui.data('uuid'));
+          }else{
+            o = new Object();
+          }
+          o.uuid = ui.attr('data-uuid');
+          o.type = ui.attr('data-name');
+          o.x = ui.position().left.toString();
+          o.y = ui.position().top.toString();
+          o.direction = getVal(ui.attr("data-rotate"));
+          o.rotate = ui.attr("data-rotate");
+          if(o.direction == 'h'){
+            o.w = ui.outerWidth().toString();
+            o.h = ui.find("hr").css("border-top-width").split("px")[0];
+            o.color = rgb2hex(ui.find("hr").css("border-top-color"));
+          }else{
+            o.w = ui.find("hr").css("border-right-width").split("px")[0];
+            o.h = ui.outerHeight().toString();
+            o.color = rgb2hex(ui.find("hr").css("border-right-color"));
+          }
+          o.lineStyle = ui.attr('data-ltype');
+          console.log(JSON.stringify(data));
+          if(update) return;
+          p.children.push(o);
+          console.log(JSON.stringify(data));
+        }
+
+        function setRect(parent,ui,update = false){
+          var o;
+          var p = data.layout.find(element => element.uuid == parent);
+          if(update){
+            o = p.children.find(ele => ele.uuid == ui.data('uuid'));
+          }else{
+            o = new Object();
+          }
+          o.uuid = ui.attr('data-uuid');
+          o.type = ui.attr('data-name');
+          o.x = ui.position().left.toString();
+          o.y = ui.position().top.toString();
+          o.w = ui.outerWidth().toString();
+          o.h = ui.outerHeight().toString();
+          o.color = rgba2hex(ui.css("background-color"));
+          console.log(JSON.stringify(data));
+          if(update) return;
+          p.children.push(o);
+          console.log(JSON.stringify(data));
+        }
+
+        
+        function getVal(val){
+          switch (val) {
+            case 'right':
+            case 'start':
+              return '1';
+              break;
+            case 'center':
+              return '0';
+              break;
+            case 'left':
+            case 'end':
+              return '2';
+              break;
+            case 'MingLiU':
+              return '0';
+              break;
+            case '標楷體':
+              return '1';
+              break;
+            case 'rotateH':
+              return 'h';
+              break;
+            case 'rotateV':
+              return 'v';
+              break;
+          }
+        }
+        //設定底稿
+        $("#setPaper").on("click", () => {
+          var w = $("#paperW").val();
+          var h = $("#paperH").val();
+          $("#paper").height(h);
+          $("#paper").width(w);
+          $(".tempDiv").outerWidth(w);
+          setPaper();
+        });
+
+        //設定容器高
+        $("#setTemp").on("click", function () {
+          $(".selectTemp").outerHeight($("#tempH").val());
+          updateBlock($(".selectTemp").attr('data-uuid'));
+        });
+
+        //設定label、textField元件
+        $("#setTextTemp").on("click", function () {
+          var parentId = $(".selectWidget").data('parent');
+          var parent = data.layout.find(element => element.uuid == parentId);
+          var height = parseInt($("#widgetH").val()) > parseInt(parent.height) ? parent.height : $("#widgetH").val();
+          var width = parseInt($("#widgetW").val()) > parseInt(data.w) ? data.w : $("#widgetW").val();
+
+          $(".selectWidget").css({
+            "left":`${$("#posX").val()}px`,
+            "top":`${$("#posY").val()}px`,
+            "width":`${width}px`,
+            "height":`${height}px`,
+            "align-items":`${$("#vAlign").val()}`,
+          }).attr('data-fontsize',$("#fontSize").val());
+
+          $(".selectWidget p").css({
+            "font-size":`${$("#fontSize").val()}px`,
+            "font-family":`${$("#fontType").val()}`,
+            "text-align":`${$("#hAlign").val()}`,
+            "color":`${$("#fontColor").val()}`,
+            "fontWeight":`${$("#fontWeight").val()}`,
+          }).html(`${$("#content").val().replace(/\n/g,"<br>")}`);
+
+          //處理border
+          var b = [];
+          var bId = [];
+          $("input[name='border']:checked").map(function(){
+            bId.push($(this).attr('id'));
+            b.push($(this).val());
+          });
+          $(".selectWidget").removeClass("borderT borderB borderL borderR").attr("data-border",b).attr('data-borderid',bId);
+          if(bId.length > 0){
+            bId.map(function(ele){
+              $(".selectWidget").addClass(ele);
+            });
+          } 
+
+          setLabel($(".selectWidget").data('parent'),$(".selectWidget"),true);
+        });
+
+        //設定line元件
+        $("#setLineTemp").on('click',function(){
+          var parentId = $(".selectWidget").data('parent');
+          var parent = data.layout.find(element => element.uuid == parentId);
+
+          $(".selectWidget").css({
+            "left":`${$("#posX").val()}px`,
+            "top":`${$("#posY").val()}px`,
+          });
+          $(".selectWidget").attr("data-ltype",$("#lineStyle").val());
+          $(".selectWidget").removeClass("rotateV rotateH").attr("data-rotate","");
+          var r = $("#direction").val();
+          $(".selectWidget").attr("data-rotate",r);
+          if(r =='rotateH'){
+            var width = parseInt($("#widgetW").val()) > parseInt(data.w) ? data.w : $("#widgetW").val();
+
+            $(".selectWidget").css({
+              "width":`${width}px`,
+              "height":`${$("#widgetH").val()}px`,
+            })
+            $(".selectWidget hr").css({
+              "border-top-color":`${$("#color").val()}`,
+              "border-top-style":`${$("#lineStyle").val().replace($("#lineStyle").val()[0],$("#lineStyle").val()[0].toLowerCase())}`,
+              "border-top-width":`${$("#widgetH").val()}px`,
+              "border-right":"0",
+            });
+          }else{
+            var height = parseInt($("#widgetH").val()) > parseInt(parent.height) ? parent.height : $("#widgetH").val();
+
+            $(".selectWidget").css({
+              "width":`${$("#widgetW").val()}px`,
+              "height":`${height}px`,
+            })
+            $(".selectWidget hr").css({
+              "border-right-color":`${$("#color").val()}`,
+              "border-right-style":`${$("#lineStyle").val().replace($("#lineStyle").val()[0],$("#lineStyle").val()[0].toLowerCase())}`,
+              "border-right-width":`${$("#widgetW").val()}px`,
+              "border-top":"0",
+            });
+          }
+          setLine($(".selectWidget").data('parent'),$(".selectWidget"),true)
+        });
+
+        //設定rect元件
+        $("#setRectTemp").on('click',function(){
+          var parentId = $(".selectWidget").data('parent');
+          var parent = data.layout.find(element => element.uuid == parentId);
+          var height = parseInt($("#widgetH").val()) > parseInt(parent.height) ? parent.height : $("#widgetH").val();
+          var width = parseInt($("#widgetW").val()) > parseInt(data.w) ? data.w : $("#widgetW").val();
+
+          $(".selectWidget").css({
+            "left":`${$("#posX").val()}px`,
+            "top":`${$("#posY").val()}px`,
+            "width":`${width}px`,
+            "height":`${height}px`,
+            "background-color":`${$("#recColor").val()}`,
+          });
+          setRect($(".selectWidget").data('parent'),$(".selectWidget"),true)
+        });
+
+        //設定image元件
+        $("#setImageTemp").on('click',function(){
+          var parentId = $(".selectWidget").data('parent');
+          var parent = data.layout.find(element => element.uuid == parentId);
+          var height = parseInt($("#widgetH").val()) > parseInt(parent.height) ? parent.height : $("#widgetH").val();
+          var width = parseInt($("#widgetW").val()) > parseInt(data.w) ? data.w : $("#widgetW").val();
+          $(".selectWidget").css({
+            "left":`${$("#posX").val()}px`,
+            "top":`${$("#posY").val()}px`,
+            "width":`${width}px`,
+            "height":`${height}px`,
+          });
+          $(".emptyImg").css({
+            "border-bottom-width":`${parseInt(height)-10}px`,
+            "border-right-width":`${parseInt(width)-10}px`,
+          })
+        });
+
+        //元件刪除
+        $(".delete").on('click',function(){
+          removeWidget($(".selectWidget").attr('data-parent'),$(".selectWidget").attr('data-uuid'))
+          $(".selectWidget").remove();
+        });
+
+        //容器刪除
+        $("#deleteTemp").on('click',function(){
+          removeBlock($(".selectTemp").attr('data-uuid'));
+          $(".selectTemp").remove();
+        });
+
+
+        //設定容器拖曳
+        $(".blocks").draggable({
+          scroll: true,
+          revert: "invalid",
+          // stack: "#paper",
+          zIndex: 10,
+          cursor: "move",
+          grid: [1, 1],
+          helper: function (event) {
+            var name = $(this).find("p").text();
+            var dataName = $(this)
+              .find("p")
+              .text()
+              .split(" ")
+              .join("")
+              .replace(/^\S/, (s) => s.toLowerCase());
+            var w = $("#paper").width();
+            var order = $(this).data("order");
+            return $(
+              `<li data-order=${order} data-name=${dataName} class="tempDiv" style="width:${w}px; height:100px"><p class="m-0 text-black-50">${name}</p></li>`
+            );
+          },
+          start: function (event, ui) {
+            $("#setBlockHeight,#commonSetting,#textSetting").hide();
+            $("#paper li").removeClass("selectTemp");
+            $(".widgetText").removeClass("selectWidget");
+          },
+          stop: function (event, ui) {},
+        });
+
+        //設定底稿放置
+        $("#paper").droppable({
+          accept: ".blocks",
+          drop: function (event, ui) {
+            var name = $(ui.helper).data("name");
+            if ($(`#paper > li[data-name = ${name}]`).length == 1 && name != "detail") return;
+            var new_ui = $(ui.helper).clone(true);
+            new_ui.attr('data-uuid',uuidv4());
+            $(this).append(new_ui);
+
+            setBlock(new_ui);
+
+            new_ui.css({ top: "0px", left: "0px", position: "relative" });
+            var elems = $("#paper").children("li").get();
+            elems.sort(function (a, b) {
+              return (
+                parseInt($(a).data("order")) - parseInt($(b).data("order"))
+              );
+            });
+            $("#paper").append(elems);
+
+            //設定元件放置
+            widgetDrop();
+
+            //點擊容器
+            tempClick();
+            
+          },
+        });
+
+        //設定元件拖曳
+        $("#label,#textField").draggable({
+          scroll: true,
+          revert: "invalid",
+          // stack: "#tempDiv",
+          zIndex: 20,
+          cursor: "move",
+          cursorAt: { top: 2, left: 2},
+          grid: [1, 1],
+          helper: function (event) {
+            var dataName = $(this).attr("id");
+            var dataType = $(this).attr("data-type");
+            return $(
+              `<div class="widgetText solid" data-name=${dataName} data-type=${dataType} data-border="" data-bordeid="" data-fontsize="16"><p class="m-0 w-100" style="font-family:MingLiU;font-weight:400; white-space: pre;">文字內容</p></div>`
+            );
+          },
+          grid: [1, 1],
+          start: function (event, ui) {
+            reSet($(ui.helper));
+          },
+        });
+
+        $("#line").draggable({
+          scroll: true,
+          revert: "invalid",
+          // stack: "#tempDiv",
+          zIndex: 20,
+          cursor: "move",
+          cursorAt: { top: 0, left: 10},
+          helper: function (event) {
+            var dataName = $(this).attr("id");
+            var dataType = $(this).attr("data-type");
+            return $(
+              `<div class="widgetLine rotateH" data-name=${dataName} data-type=${dataType} data-ltype="Solid" data-rotate="rotateH"><hr></div>`
+            );
+          },
+          grid: [1, 1],
+          start: function (event, ui) {
+            reSet($(ui.helper));
+          },
+        });
+
+        $("#rect").draggable({
+          scroll: true,
+          revert: "invalid",
+          // stack: "#tempDiv",
+          zIndex: 20,
+          cursor: "move",
+          cursorAt: { top: 2, left: 2},
+          helper: function (event) {
+            var dataName = $(this).attr("id");
+            var dataType = $(this).attr("data-type");
+            return $(
+              `<div class="widgetRect" data-name=${dataName} data-type=${dataType}></div>`
+            );
+          },
+          grid: [1, 1],
+          start: function (event, ui) {
+            reSet($(ui.helper));
+          },
+        });
+
+        $("#image").draggable({
+          scroll: true,
+          revert: "invalid",
+          // stack: "#tempDiv",
+          zIndex: 20,
+          cursor: "move",
+          cursorAt: { top: 2, left: 2},
+          helper: function (event) {
+            var dataName = $(this).attr("id");
+            var dataType = $(this).attr("data-type");
+            return $(
+              `<div class="widgetImage" data-name=${dataName} data-type=${dataType}><div class="emptyImg"></div></div>`
+            );
+          },
+          grid: [1, 1],
+          start: function (event, ui) {
+            reSet($(ui.helper));
+          },
+        });
+
+
+        ///border點擊全選
+        $("#allBorder").on("click",function(){
+          $("input[name='border']").prop('checked', true);
+        });
+
+
+        function uuidv4() {
+        // return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        return crypto.randomUUID();
+      }
+
+
+      function getTextSetting(w){
+        $("#commonSetting,#textSetting").show();
+        $("#posX").val(w.position().left);
+        $("#posY").val(w.position().top);
+        $("#widgetH").val(w.outerHeight());
+        $("#widgetW").val(w.outerWidth());
+        $("#fontType").val(w.find("p").css("font-family")).trigger("change");
+        $("#fontSize").val(w.find("p").css("font-size").split('px')[0] <= 12 ? w.attr('data-fontsize') : w.find("p").css("font-size").split('px')[0]);
+        $("#fontColor").val(w.find("p").css("color"));
+        $("#fontWeight").val(w.find("p").css("font-weight")).trigger("change");
+        $("#hAlign").val(w.find("p").css("text-align")).trigger("change");
+        $("#vAlign").val(w.css("align-items")).trigger("change");
+        $("#content").val(w.find("p").html().replace(RegExp("<br>","g"),"\r\n"));
+        ///border處理
+        $("input[name='border']").prop('checked', false);
+        if(w.attr('data-border')!=''){
+          w.attr('data-borderid').split(',').forEach(element => {
+            $(`input[id="${element}"]`).prop('checked', true);
+          });
+        }
+      };
+
+      function getLineSetting(w){
+        $("#commonSetting,#lineSetting").show();
+        $("#posX").val(w.position().left);
+        $("#posY").val(w.position().top);
+        var r = w.attr("data-rotate");
+        if(r=='rotateH'){
+          $("#widgetW").val(w.outerWidth());
+          $("#widgetH").val(w.find("hr").css("border-top-width").split("px")[0]);
+          $("#color").val(w.find("hr").css("border-top-color"));
+        }else{
+          $("#widgetW").val(w.find("hr").css("border-right-width").split("px")[0]);
+          $("#widgetH").val(w.outerHeight());
+          $("#color").val(w.find("hr").css("border-right-color"));
+        }
+        $("#lineStyle").val(w.attr('data-ltype')).trigger('change');
+        $("#color").val(w.find("hr").css("border-top-color"));
+        $("#direction").val(w.attr('data-rotate')).trigger('change');
+      }
+
+      function getRectSetting(w){
+        $("#commonSetting,#recSetting").show();
+        $("#posX").val(w.position().left);
+        $("#posY").val(w.position().top);
+        $("#widgetH").val(w.outerHeight());
+        $("#widgetW").val(w.outerWidth());
+        $("#recColor").val(w.css("background-color"));
+      }
+
+      function getImageSetting(w){
+        $("#commonSetting,#imageSetting").show();
+        $("#posX").val(w.position().left);
+        $("#posY").val(w.position().top);
+        $("#widgetH").val(w.outerHeight());
+        $("#widgetW").val(w.outerWidth());
+      }
+
+      function reSet(w){
+        $("#commonSetting,#textSetting,#lineSetting,#recSetting,#imageSetting").hide();
+        $("#setBlockHeight").hide();
+        $("#paper li").removeClass("selectTemp");
+        $(".widgetText,.widgetLine,.widgetRect,.widgetImage").removeClass("selectWidget");
+        $("#type").text(w.data('type'));
+      }
+
+      const rgb2hex = (rgb) => `#${rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/).slice(1).map(n => parseInt(n, 10).toString(16).padStart(2, '0')).join('')}`
+      const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
+
+      function tempClick(){
+        $(".tempDiv").on("click", function () {
+          $("#setBlockHeight").show();
+          $("#commonSetting,#textSetting,#lineSetting,#recSetting,#imageSetting").hide();
+          $(".widgetText,.widgetLine,.widgetRect,.widgetImage").removeClass("selectWidget");
+          $("#paper li").removeClass("selectTemp");
+          $(this).addClass("selectTemp");
+          $("#tempH").val($(this).outerHeight());
+        });
+      }
+
+      function clickLabel() {
+        $(".widgetText").on("click", function (event) {
+          event.stopPropagation();
+          reSet($(this));
+          $(this).addClass("selectWidget");
+          getTextSetting($(this));
+        });
+      }
+
+      function clickLine() {
+        $(".widgetLine").on('click',function(event){
+          event.stopPropagation();
+          reSet($(this));
+          $(this).addClass("selectWidget");
+          getLineSetting($(this));
+        });
+      }
+
+      function clickRect() {
+        $(".widgetRect").on('click',function(event){
+          event.stopPropagation();
+          reSet($(this));
+          $(this).addClass("selectWidget");
+          getRectSetting($(this));
+        })
+      }
+
+      function setDrag(parent,new_ui) {
+        new_ui.draggable({
+          containment: "parent",
+          scroll: true,
+          // stack: "#tempDiv",
+          zIndex: 20,
+          cursor: "move",
+          start: function (event, ui) {
+            reSet($(ui.helper));
+            $(this).addClass("selectWidget");
+            if($(ui.helper).attr('data-name')=='label' || ui.helper.attr('data-name')=='textField'){
+              getTextSetting($(ui.helper));
+            }else if($(ui.helper).attr('data-name')=='line'){
+              getLineSetting($(ui.helper));
+            }else if($(ui.helper).attr('data-name')=='rect'){
+              getRectSetting($(ui.helper));
+            }else if($(ui.helper).attr('data-name')=='image'){
+              getImageSetting($(ui.helper));
+            }
+          },
+          drag: function( event, ui ) {
+            $("#posX").val(Math.trunc($(ui.helper).position().left));
+            $("#posY").val(Math.trunc($(ui.helper).position().top));
+            setTemplate(parent, new_ui,true);
+          },
+
+        });
+      }
+
+      function widgetDrop(){
+        $(".tempDiv").droppable({
+          accept: ".widgets",
+          drop: function (event, ui) {
+            var new_ui = $(ui.helper).clone(true);
+            new_ui.attr('data-uuid',uuidv4()).attr('data-parent',$(this).attr('data-uuid'));
+            $(this).append(new_ui);
+
+            var $this = $(this);
+
+            setDrag($(this).attr('data-uuid'),new_ui);
+            
+            var pos = $(ui.helper).offset();
+            var treePos = $(this).offset();
+            new_ui.css({
+              left: Math.trunc(pos.left - treePos.left),
+              top: Math.trunc(pos.top - treePos.top),
+            });
+
+            setTemplate($(this).attr('data-uuid'), new_ui);
+
+            //點擊文字元件
+            clickLabel();
+          
+
+            ///點擊line元件
+            clickLine();
+          
+            ///點擊rect元件
+            clickRect();
+            
+
+            ///點擊image元件
+            $(".widgetImage").on('click',function(event){
+              event.stopPropagation();
+              reSet($(this));
+              $(this).addClass("selectWidget");
+              getImageSetting($(this));
+            })
+          },
+        });
+      }
+
+
+
+    
+      });
+
+      
+    </script>
+  </head>
+
+  <body>
+    <div class="row justify-content-center align-content-center">
+      <div class="col-8 p-0 mt-3">
+        <div class="row g-3 align-items-center">
+          <div class="col-auto">
+            <label class="col-form-label">系統別</label>
+          </div>
+          <div class="col-2">
+            <select class="selectField w-100">
+              <option value="xxx"></option>
+              <option value="xxx"></option>
+              <option value="xx"></option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <label class="col-form-label">表單代號</label>
+          </div>
+          <div class="col-3">
+            <select class="selectField w-100">
+              <option value="xxx"></option>
+              <option value="xxx"></option>
+              <option value="xx"></option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-success ms-2">
+              載入
+            </button>
+          </div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-warning ms-2">
+              儲存
+            </button>
+          </div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-danger ms-2">
+              產生報表
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-center align-content-center">
+      <div class="col-8 p-0 my-3">
+        <div class="row g-3 align-items-center">
+          <div class="col-auto">
+            <label class="col-form-label">寬度</label>
+          </div>
+          <div class="col-auto">
+            <input id="paperW" class="form-control">
+          </div>
+          <div class="col-auto">
+            <label class="col-form-label">高度</label>
+          </div>
+          <div class="col-auto">
+            <input id="paperH" class="form-control">
+          </div>
+          <div class="col-auto">
+            <label class="col-form-label">主資料來源</label>
+          </div>
+          <div class="col-auto">
+            <input id="mainDs" class="form-control">
+          </div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-dark ms-2" id="setPaper">
+              套用
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row h-75">
+      <div class="col-2 h-100 ps-5">
+        <div class="">
+          <div class="template blocks" data-order="1">
+            <i class="fa-solid fa-inbox mx-2" style="color:blue"></i>
+            <p class="d-inline m-0">Title</p>
+          </div>
+          <div class="template blocks" data-order="4">
+            <i class="fa-solid fa-inbox mx-2" style="color:blue"></i>
+            <p class="d-inline m-0">Detail</p>
+          </div>
+          <div class="template blocks" data-order="7">
+            <i class="fa-solid fa-inbox mx-2" style="color:blue"></i>
+            <p class="d-inline m-0">Summary</p>
+          </div>
+          <div class="template blocks" data-order="2">
+            <i class="fa-solid fa-inbox mx-2" style="color:red"></i>
+            <p class="d-inline m-0">Page Header</p>
+          </div>
+          <div class="template blocks" data-order="6">
+            <i class="fa-solid fa-inbox mx-2" style="color:red"></i>
+            <p class="d-inline m-0">Page Footer</p>
+          </div>
+          <div class="template blocks" data-order="3">
+            <i class="fa-solid fa-inbox mx-2" style="color:green"></i>
+            <p class="d-inline m-0">Column Header</p>
+          </div>
+          <div class="template blocks" data-order="5">
+            <i class="fa-solid fa-inbox mx-2" style="color:green"></i>
+            <p class="d-inline m-0">Column Footer</p>
+          </div>
+        </div>
+        <div class="template widgets" id="label" data-type="Label">
+          <i class="fa-solid fa-pencil mx-2" style="color:orange"></i>
+          <p class="d-inline m-0">Label</p>
+        </div>
+        <div class="template widgets" id="textField" data-type="TextField">
+          <i class="fa-solid fa-font mx-2" style="color:orange"></i>
+          <p class="d-inline m-0">Text Field</p>
+        </div>
+        <div class="template widgets" id="line" data-type="Line">
+          <i class="fa-solid fa-grip-lines mx-2" style="color:orange"></i>
+          <p class="d-inline m-0">Line</p>
+        </div>
+        <div class="template widgets" id="rect" data-type="Rect">
+          <i class="fa-solid fa-vector-square mx-2" style="color:orange"></i>
+          <p class="d-inline m-0">Rect</p>
+        </div>
+        <div class="template widgets" id="image" data-type="Image">
+          <i class="fa-regular fa-image mx-2" style="color:orange"></i>
+          <p class="d-inline m-0">Image</p>
+        </div>
+      </div>
+      <div id="container" class="col-8 border border-secondary bg-dark bg-opacity-10 overflow-scroll">
+        <ul class="bg-white position-relative overflow-hidden" id="paper"></ul>
+      </div>
+      <div class="col-2 h-100">
+        <div class="row justify-content-center">
+          <!-- 容器高度設定 -->
+          <div class="col-11 p-0 my-3 text-center" id="setBlockHeight">
+            <div class ="d-flex justify-content-around align-items-center my-3">
+              <div class ="d-inline-block mx-1">高度</div>
+              <input type="text" id="tempH" class="form-control w-auto"/>
+            </div>
+            <div>
+              <button type="button" class="btn btn-dark d-inline-block mx-2" id="setTemp">
+                套用
+              </button>
+              <button type="button" class="btn btn-outline-secondary d-inline-block mx-2" id="deleteTemp">
+                刪除
+              </button>
+            </div>
+          </div>
+          <!-- 通用設定 -->
+          <div class="col-11 px-2" id="commonSetting">
+            <div class ="d-flex justify-content-center">
+              <h4 type="text" id="type" class="m-0"></h2>
+            </div>
+            <div class ="d-flex justify-content-between align-items-center my-3">
+              <div class ="d-inline-block mx-1">X 座標</div>
+              <input type="text" id="posX" class="form-control"/>
+            </div>
+            <div class ="d-flex justify-content-between align-items-center my-3">
+              <div class="d-inline-block mx-1">Y 座標</div>
+              <input type="text" id="posY" class="form-control"/>
+            </div>
+            <div class ="d-flex justify-content-between align-items-center my-3">
+              <div class="d-inline-block mx-1">寬度</div>
+              <input type="text" id="widgetW" class="form-control"/>
+            </div>
+            <div class ="d-flex justify-content-between align-items-center my-3">
+              <div class="d-inline-block mx-1">高度</div>
+              <input type="text" id="widgetH" class="form-control"/>
+            </div>
+          </div>
+          <!-- label、textField 設定 -->
+          <div class="col-11 px-2" id="textSetting">
+            <div class ="d-flex justify-content-between align-items-center mb-3">
+              <div class="d-inline-block mx-1">文字字型</div>
+              <select id="fontType" class="selectField">
+               <option value="MingLiU">細明體</option>
+                <option value="標楷體">標楷體</option>
+              </select>
+            </div>
+            <div class ="d-flex justify-content-between align-items-center my-3">
+              <div class ="d-inline-block mx-1">文字大小</div>
+              <input type="text" id="fontSize" class="form-control"/>
+            </div>
+            <div class ="d-flex justify-content-between align-items-center my-3">
+              <div class ="d-inline-block mx-1">文字顏色</div>
+              <input type="text" id="fontColor" class="form-control"/>
+            </div>
+            <div class ="d-flex justify-content-between align-items-center mb-3">
+              <div class="d-inline-block mx-1">文字粗體</div>
+              <select id="fontWeight" class="selectField">
+                <option value="400">否</option>
+                <option value="700">是</option>
+              </select>
+            </div>
+            <div class ="d-flex justify-content-between align-items-center my-3">
+              <div class ="d-inline-block mx-1">文字內容</div>
+              <textarea class="form-control" id="content" rows="3"></textarea>
+            </div>
+            <div class ="d-flex justify-content-between my-3">
+              <div class="d-inline-block mx-1">水平對齊</div>
+              <select id="hAlign" class="selectField">
+                <option value="right">靠右</option>
+                <option value="center">置中</option>
+                <option value="left">靠左</option>
+              </select>
+            </div>
+            <div class ="d-flex justify-content-between my-3">
+              <div class="d-inline-block mx-1">垂直對齊</div>
+              <select id="vAlign" class="selectField">
+                <option value="start">靠上</option>
+                <option value="center">置中</option>
+                <option value="end">靠下</option>
+              </select>
+            </div>
+            <div class ="d-flex align-items-center my-3">
+              <div class ="d-inline-block mx-1">邊框</div>
+            </div>
+            <div class ="d-flex mx-1 justify-content-between align-items-center">
+              <div class="w-auto me-2">
+                
+                <button type="button" class="btn btn-outline-primary btn-sm" id="allBorder">全選</button>
+              </div>
+              <div class="form-check form-check-inline m-1">
+                <input class="form-check-input" type="checkbox" name="border" id="borderT" value="top">
+                <label class="form-check-label" for="borderT">上</label>
+              </div>
+              <div class="form-check form-check-inline m-1">
+                <input class="form-check-input" type="checkbox" name="border" id="borderB" value="bottom">
+                <label class="form-check-label" for="borderB">下</label>
+              </div>
+              <div class="form-check form-check-inline m-1">
+                <input class="form-check-input" type="checkbox" name="border" id="borderL" value="left">
+                <label class="form-check-label" for="borderL">左</label>
+              </div>
+              <div class="form-check form-check-inline m-1">
+                <input class="form-check-input" type="checkbox" name="border" id="borderR" value="right">
+                <label class="form-check-label" for="borderR">右</label>
+              </div>
+            </div>
+            <div class="w-100 text-center my-3">
+              <button type="button" class="btn btn-dark d-inline-block mx-2" id="setTextTemp">
+                套用
+              </button>
+              <button type="button" class="delete btn btn-outline-secondary d-inline-block mx-2">
+                刪除
+              </button>
+            </div>
+          </div>
+          <!-- line 設定 -->
+          <div class="col-11 px-2" id="lineSetting">
+            <div class ="d-flex justify-content-between align-items-center">
+              <div class ="d-inline-block mx-1">顏色</div>
+              <input type="text" id="color" class="form-control"/>
+            </div>
+            <div class ="d-flex justify-content-between align-items-center my-3">
+              <div class="d-inline-block mx-1">樣式</div>
+              <select id="lineStyle" class="selectField">
+                <option value="Solid">實線</option>
+                <option value="Dashed">虛線</option>
+              </select>
+            </div>
+            <div class ="d-flex justify-content-between align-items-center my-3">
+              <div class="d-inline-block mx-1">直橫</div>
+              <select id="direction" class="selectField">
+                <option value="rotateH">橫向</option>
+                <option value="rotateV">直向</option>
+              </select>
+            </div>
+            <div class="w-100 text-center my-3">
+              <button type="button" class="btn btn-dark d-inline-block mx-2" id="setLineTemp">
+                套用
+              </button>
+              <button type="button" class="delete btn btn-outline-secondary d-inline-block mx-2">
+                刪除
+              </button>
+            </div>
+          </div>
+          <!-- rect 設定 -->
+          <div class="col-11 px-2" id="recSetting">
+            <div class ="d-flex justify-content-between align-items-center">
+              <div class ="d-inline-block mx-1">顏色</div>
+              <input type="text" id="recColor" class="form-control"/>
+            </div>
+            <div class="w-100 text-center my-3">
+              <button type="button" class="btn btn-dark d-inline-block mx-2" id="setRectTemp">
+                套用
+              </button>
+              <button type="button" class="delete btn btn-outline-secondary d-inline-block mx-2">
+                刪除
+              </button>
+            </div>
+          </div>
+          <!-- image 設定 -->
+          <div class="col-11 px-2" id="imageSetting">
+            <div class ="d-flex justify-content-between align-items-center mb-3">
+              <div class="d-inline-block mx-1">檔案位置</div>
+              <select id="filePath" class="selectField">
+                <option value=""></option>
+                <option value=""></option>
+              </select>
+            </div>
+            <div class ="d-flex justify-content-between align-items-center my-3">
+              <div class="d-inline-block mx-1">影像比例</div>
+              <select id="fileRate" class="selectField">
+                <option value="">FillFrame</option>
+                <option value="">Clip</option>
+                <option value="">RetainShape</option>
+                <option value="">RealSize</option>
+                <option value="">RealHeight</option>
+              </select>
+            </div>
+            <div class="w-100 text-center my-3">
+              <button type="button" class="btn btn-dark d-inline-block mx-2" id="setImageTemp">
+                套用
+              </button>
+              <button type="button" class="delete btn btn-outline-secondary d-inline-block mx-2">
+                刪除
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

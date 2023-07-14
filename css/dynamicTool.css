@@ -1,0 +1,136 @@
+body{
+	height:1000px;
+}
+
+ul{
+  padding: 0;
+}
+
+li{
+  list-style: none;
+  list-style-type: none;
+}
+
+#container{
+  height:95%;
+}
+
+.template{
+  margin: 12px auto;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  border: 1px solid rgb(219, 218, 218);
+  border-radius: 5px;
+  padding: 2px 6px;
+  width: 160px;
+}
+
+.fa-inbox{
+  color:rgb(91, 86, 244);
+}
+#paper{
+    margin: 0 auto;
+}
+
+.tempDiv, .widgetText, .widgetImage{
+  padding: 0;
+  border: 1px solid rgb(219, 218, 218);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: transparent;
+}
+
+.tempDiv.selectTemp{
+  border: 2px solid #0dcaf0;
+}
+
+.widgetText.selectWidget, .widgetLine.selectWidget, .widgetRect.selectWidget, .widgetImage.selectWidget{
+  outline: 2px solid rgb(255, 203, 61);
+}
+
+.form-control{
+  padding: 0.1rem 0.4rem;
+  border: 1px solid #aaa;
+  width: 180px;
+}
+
+.selectField{
+  width: 180px;
+}
+
+/* 上邊框 */
+.borderT{
+  border-top-width: 1px;
+  border-top-color: black;
+}
+
+/* 下邊框 */
+.borderB{
+  border-bottom-width: 1px;
+  border-bottom-color: black;
+}
+
+/* 左邊框 */
+.borderL{
+  border-left-width: 1px;
+  border-left-color: black;
+}
+
+/* 右邊框 */
+.borderR{
+  border-right-width: 1px;
+  border-right-color: black;
+}
+
+/* 四周實線 */
+.solid{
+  border-style: solid;
+}
+
+.widgetLine{
+  border: 1px solid rgb(219, 218, 218);
+  width: 100px;
+}
+
+body hr{
+  opacity: 1;
+  width: 100%;
+  border-top: 1px solid black;
+  background-color: transparent;
+  margin: 0;
+}
+
+hr:not([size]) {
+  height: 100%;
+}
+
+.widgetRect,.widgetImage{
+  border: 1px solid rgb(219, 218, 218);
+  width: 50px;
+  height: 50px;
+}
+
+.widgetImage .emptyImg{
+  height: 0;   
+  width: 0;   
+  overflow: hidden;
+  border-color: transparent rgb(219, 218, 218) transparent transparent;   
+  border-style: solid;   
+  border-width: 0 40px 40px 0;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5);
+  border-radius: 20px;
+  border: transparent;
+}

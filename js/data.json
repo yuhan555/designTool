@@ -1,0 +1,113 @@
+var data = {
+  "mainDs": "",
+  "w": "800",
+  "h": "1240",
+  "layout": [
+    {
+      "type": "title",
+      "height": "100",
+      "uuid": "39fdc448-b0e3-4bd0-b49d-febbda8d6a49",
+      "order": "1",
+      "children": [
+        {
+          "uuid": "a443985c-f14f-43ae-a908-1dd07c434a52",
+          "type": "label",
+          "x": "150",
+          "y": "36",
+          "w": "150",
+          "h": "26",
+          "text": "文字內容xxx",
+          "fontSize": "16",
+          "vAlign": "0",
+          "hAlign": "0",
+          "fontName": "1",
+          "fontColor": "#212529",
+          "isBold": "N",
+          "border": "bottom,left",
+          "borderId": "borderB,borderL"
+        },
+        {
+          "uuid": "904aee25-e193-4c00-bfd3-bd2b02a292e2",
+          "type": "line",
+          "x": "472",
+          "y": "34",
+          "direction": "v",
+          "rotate": "rotateV",
+          "w": "2",
+          "h": "50",
+          "color": "#000000",
+          "lineStyle": "Dashed"
+        }
+      ]
+    },
+    {
+      "type": "columnHeader",
+      "height": "100",
+      "uuid": "daec5aa8-dc0f-4b3b-aa54-cddcd1f7d111",
+      "order": "3",
+      "children": [
+        {
+          "uuid": "74ccf79f-bec6-4a59-a2ef-fc9c066dda1b",
+          "type": "textField",
+          "x": "115",
+          "y": "44",
+          "w": "66",
+          "h": "26",
+          "text": "文字內容",
+          "fontSize": "16",
+          "vAlign": "0",
+          "hAlign": "0",
+          "fontName": "0",
+          "fontColor": "#212529",
+          "isBold": "N",
+          "border": ""
+        }
+      ]
+    },
+    {
+      "type": "detail",
+      "height": "100",
+      "uuid": "1f21b755-ae84-476a-a9c9-b47269c9c85d",
+      "order": "4",
+      "children": [
+        {
+          "uuid": "904aee25-e193-4c00-bfd3-bd2b02a292e2",
+          "type": "line",
+          "x": "524",
+          "y": "48",
+          "direction": "h",
+          "rotate": "rotateH",
+          "w": "100",
+          "h": "1",
+          "color": "#000000",
+          "lineStyle": "Solid"
+        },
+        {
+          "uuid": "fd0355cf-2f43-49ea-a841-7c644d0891d7",
+          "type": "rect",
+          "x": "54",
+          "y": "38",
+          "w": "50",
+          "h": "50",
+          "color": "#00000000"
+        },
+        {
+          "uuid": "ab669e78-18bf-4ed1-b616-72727c45baaa",
+          "type": "rect",
+          "x": "100",
+          "y": "50",
+          "w": "30",
+          "h": "30",
+          "color": "red"
+        }
+      ]
+    },
+    {
+      "type": "columnFooter",
+      "height": "100",
+      "uuid": "1b36f3f3-c91b-4538-b01a-75cbc23dc65b",
+      "order": "5",
+      "children": []
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/jquery-ui.min.css"/>
+    <link rel="stylesheet" href="css/dragEle.css"/>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <title>Title</title>
+    <script>
+        $(document).ready(()=>{
+            $("#paper").height(500);
+            $("#paper").width(500);
+
+          $("#setPaper").on('click',()=>{
+            var w = $("#paperW").val();
+            var h = $("#paperH").val();
+            $("#paper").height(h);
+            $("#paper").width(w);
+          });
+
+
+          $(".dragItem").draggable({
+            // containment: "#paper",
+            scroll: true,
+            revert: "invalid",
+            helper: function(event) {
+                return $("<div class='pink'></div>");
+            },
+            grid: [ 1, 1 ],
+            drag: function(event, ui) {
+                const rx = ui.position.left;
+                const ry = ui.position.top;
+                $('#o-guide-v').css({left: rx ,height:$("#paperH").val()});
+                $('#o-guide-h').css({top: ry , width:$("#paperW").val()});
+                $('#o-guide-v,#o-guide-h').show()
+        },
+              stop: function(event, ui) {
+                $('#o-guide-v,#o-guide-h').hide();
+              },
+            });
+
+            $("#paper").droppable({
+                accept: ".dragItem",
+                drop: function( event, ui ) {
+                    var new_ui = $(ui.helper).clone(true);
+                    $(this).append(new_ui);
+                    new_ui.draggable({
+                    containment: "parent",
+                    scroll: true,
+                    grid: [ 1, 1 ],
+                    drag: function(event, ui) {
+                        $('#guide-v,#guide-h').hide();
+                        const x = ui.position.left;
+                        const y = ui.position.top;
+                        $('#guide-v').css({left: x ,height:$("#paperH").val()});
+                        $('#guide-h').css({top: y , width:$("#paperW").val()});
+                        $('#guide-v,#guide-h').show()
+                    },
+                    stop: function(event, ui) {
+                        $('#guide-v,#guide-h').hide();
+                    },
+                });
+                var pos = $(ui.helper).offset();
+                var treePos = $(this).offset();
+                new_ui.css({"left": pos.left - treePos.left, "top": pos.top - treePos.top}); 
+            }
+         });
+
+
+        
+        });
+
+
+
+    </script>
+</head>
+<body>
+    <div class="row justify-content-center align-items-center h-100">
+        <div class="col-md-10 h-100">
+            <div class="row">
+                <div class="col-md-12 p-0 my-2">
+                    <div class="d-inline-block me-1">寬</div><input type="text" id="paperW">
+                    <div class="d-inline-block me-1">高</div><input type="text" id="paperH">
+                    <button type="button" class="btn btn-dark ms-2" id="setPaper">設定</button>
+                </div>
+            </div>
+            <div class="row h-100 w-100 justify-content-between">
+                <div class="col-md-10 border border-secondary bg-dark bg-opacity-10 position-relative overflow-scroll" id="paperContainer">
+                    <div class="position-absolute top-0 start-0 bg-white" id="paper">
+                        <!-- 拖动辅助线 -->
+                        <div id="guide-h" class="guide"></div>
+                        <div id="guide-v" class="guide"></div>
+                    </div>
+                </div>
+                <div class="col-md-2 justify-content-center">
+                    <div class="row">
+                        <div class="col d-flex justify-content-center m-1"><div type="button" class="btn btn-primary dragItem">Primary</div></div>
+                        <div class="col d-flex justify-content-center m-1"><div type="button" class="btn btn-secondary dragItem">Secondary</div></div>
+                        <div class="col d-flex justify-content-center m-1"><div type="button" class="btn btn-success dragItem">Success</div></div>
+                        <div class="col d-flex justify-content-center m-1"><div type="button" class="btn btn-danger dragItem">Danger</div></div>
+                        <div class="col d-flex justify-content-center m-1"><div type="button" class="btn btn-warning dragItem">Warning</div></div>
+                        <div class="col d-flex justify-content-center m-1"><div type="button" class="btn btn-info dragItem">Info</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 拖动辅助线 -->
+    <div id="o-guide-h" class="guide"></div>
+    <div id="o-guide-v" class="guide"></div>
+
+</body>
+</html>

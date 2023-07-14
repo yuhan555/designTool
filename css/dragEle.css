@@ -1,0 +1,41 @@
+body{
+	height:1000px;
+}
+.pink{
+	width:50px;
+	height:50px;
+  background-color: pink;
+}
+
+.guide {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+ /* 水平 */
+ #guide-h , #o-guide-h{
+  border-top: 1px red solid;
+  width: 100%;
+}
+
+/* 垂直 */
+#guide-v , #o-guide-v{
+  border-left: 1px red solid;
+  height: 100%;
+}
+
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5);
+  border-radius: 20px;
+  border: transparent;
+}
