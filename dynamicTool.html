@@ -213,6 +213,19 @@
           });
         }
 
+        function checkBlockHeight(){
+          var height = 0;
+          data.layout.forEach((e) => {
+            height += parseInt(e.height);
+            console.log(height);
+          });
+          if(height > parseInt(data.h)){
+            $("#warnMsg").show();
+          }else{
+            $("#warnMsg").hide();
+          }
+        }
+
         function updateBlock(uuid){
           data.layout.forEach((ele) => {
             if (ele.uuid == uuid) {
@@ -365,12 +378,14 @@
           $("#paper").width(w);
           $(".tempDiv").outerWidth(w);
           setPaper();
+          checkBlockHeight();
         });
 
         //設定容器高
         $("#setTemp").on("click", function () {
           $(".selectTemp").outerHeight($("#tempH").val());
           updateBlock($(".selectTemp").attr('data-uuid'));
+          checkBlockHeight();
         });
 
         //設定label、textField元件
@@ -545,6 +560,8 @@
             $(this).append(new_ui);
 
             setBlock(new_ui);
+
+            checkBlockHeight();
 
             new_ui.css({ top: "0px", left: "0px", position: "relative" });
             var elems = $("#paper").children("li").get();
@@ -834,6 +851,8 @@
               $(this).addClass("selectWidget");
               getImageSetting($(this));
             })
+
+            new_ui.trigger('click');
           },
         });
       }
@@ -848,324 +867,330 @@
   </head>
 
   <body>
-    <div class="row justify-content-center align-content-center">
-      <div class="col-8 p-0 mt-3">
-        <div class="row g-3 align-items-center">
-          <div class="col-auto">
-            <label class="col-form-label">系統別</label>
+    <div class="container-fluid">
+      <div class="row justify-content-center align-content-center">
+        <div class="col-8 p-0 mt-3">
+          <div class="row g-3 align-items-center">
+            <div class="col-auto">
+              <label class="col-form-label">系統別</label>
+            </div>
+            <div class="col-2">
+              <select class="selectField w-100">
+                <option value="xxx"></option>
+                <option value="xxx"></option>
+                <option value="xx"></option>
+              </select>
+            </div>
+            <div class="col-auto">
+              <label class="col-form-label">表單代號</label>
+            </div>
+            <div class="col-3">
+              <select class="selectField w-100">
+                <option value="xxx"></option>
+                <option value="xxx"></option>
+                <option value="xx"></option>
+              </select>
+            </div>
+            <div class="col-auto">
+              <button type="button" class="btn btn-success ms-2">
+                載入
+              </button>
+            </div>
+            <div class="col-auto">
+              <button type="button" class="btn btn-warning ms-2">
+                儲存
+              </button>
+            </div>
+            <div class="col-auto">
+              <button type="button" class="btn btn-danger ms-2">
+                產生報表
+              </button>
+            </div>
           </div>
-          <div class="col-2">
-            <select class="selectField w-100">
-              <option value="xxx"></option>
-              <option value="xxx"></option>
-              <option value="xx"></option>
-            </select>
+        </div>
+      </div>
+      <div class="row justify-content-center align-content-center">
+        <div class="col-8 p-0 my-3">
+          <div class="row g-3 align-items-center">
+            <div class="col-auto">
+              <label class="col-form-label">寬度</label>
+            </div>
+            <div class="col-auto">
+              <input id="paperW" class="form-control">
+            </div>
+            <div class="col-auto">
+              <label class="col-form-label">高度</label>
+            </div>
+            <div class="col-auto">
+              <input id="paperH" class="form-control">
+            </div>
+            <div class="col-auto">
+              <label class="col-form-label">主資料來源</label>
+            </div>
+            <div class="col-auto">
+              <input id="mainDs" class="form-control">
+            </div>
+            <div class="col-auto">
+              <button type="button" class="btn btn-dark ms-2" id="setPaper">
+                套用
+              </button>
+            </div>
+            <div class="col-auto">
+              <p class="text-danger m-0" id="warnMsg">容器加總高度超過表單高度！</p>
+            </div>
           </div>
-          <div class="col-auto">
-            <label class="col-form-label">表單代號</label>
+        </div>
+      </div>
+      <div class="row h-75">
+        <div class="col-2 h-100 ps-5">
+          <div class="">
+            <div class="template blocks" data-order="1">
+              <i class="fa-solid fa-inbox mx-2" style="color:blue"></i>
+              <p class="d-inline m-0">Title</p>
+            </div>
+            <div class="template blocks" data-order="4">
+              <i class="fa-solid fa-inbox mx-2" style="color:blue"></i>
+              <p class="d-inline m-0">Detail</p>
+            </div>
+            <div class="template blocks" data-order="7">
+              <i class="fa-solid fa-inbox mx-2" style="color:blue"></i>
+              <p class="d-inline m-0">Summary</p>
+            </div>
+            <div class="template blocks" data-order="2">
+              <i class="fa-solid fa-inbox mx-2" style="color:red"></i>
+              <p class="d-inline m-0">Page Header</p>
+            </div>
+            <div class="template blocks" data-order="6">
+              <i class="fa-solid fa-inbox mx-2" style="color:red"></i>
+              <p class="d-inline m-0">Page Footer</p>
+            </div>
+            <div class="template blocks" data-order="3">
+              <i class="fa-solid fa-inbox mx-2" style="color:green"></i>
+              <p class="d-inline m-0">Column Header</p>
+            </div>
+            <div class="template blocks" data-order="5">
+              <i class="fa-solid fa-inbox mx-2" style="color:green"></i>
+              <p class="d-inline m-0">Column Footer</p>
+            </div>
           </div>
-          <div class="col-3">
-            <select class="selectField w-100">
-              <option value="xxx"></option>
-              <option value="xxx"></option>
-              <option value="xx"></option>
-            </select>
+          <div class="template widgets" id="label" data-type="Label">
+            <i class="fa-solid fa-pencil mx-2" style="color:orange"></i>
+            <p class="d-inline m-0">Label</p>
           </div>
-          <div class="col-auto">
-            <button type="button" class="btn btn-success ms-2">
-              載入
-            </button>
+          <div class="template widgets" id="textField" data-type="TextField">
+            <i class="fa-solid fa-font mx-2" style="color:orange"></i>
+            <p class="d-inline m-0">Text Field</p>
           </div>
-          <div class="col-auto">
-            <button type="button" class="btn btn-warning ms-2">
-              儲存
-            </button>
+          <div class="template widgets" id="line" data-type="Line">
+            <i class="fa-solid fa-grip-lines mx-2" style="color:orange"></i>
+            <p class="d-inline m-0">Line</p>
           </div>
-          <div class="col-auto">
-            <button type="button" class="btn btn-danger ms-2">
-              產生報表
-            </button>
+          <div class="template widgets" id="rect" data-type="Rect">
+            <i class="fa-solid fa-vector-square mx-2" style="color:orange"></i>
+            <p class="d-inline m-0">Rect</p>
+          </div>
+          <div class="template widgets" id="image" data-type="Image">
+            <i class="fa-regular fa-image mx-2" style="color:orange"></i>
+            <p class="d-inline m-0">Image</p>
+          </div>
+        </div>
+        <div id="container" class="col-8 border border-secondary bg-dark bg-opacity-10 overflow-scroll">
+          <ul class="bg-white position-relative overflow-hidden" id="paper"></ul>
+        </div>
+        <div class="col-2 h-100">
+          <div class="row justify-content-center">
+            <!-- 容器高度設定 -->
+            <div class="col-11 p-0 my-3 text-center" id="setBlockHeight">
+              <div class ="d-flex justify-content-around align-items-center my-3">
+                <div class ="d-inline-block mx-1">高度</div>
+                <input type="text" id="tempH" class="form-control w-auto"/>
+              </div>
+              <div>
+                <button type="button" class="btn btn-dark d-inline-block mx-2" id="setTemp">
+                  套用
+                </button>
+                <button type="button" class="btn btn-outline-secondary d-inline-block mx-2" id="deleteTemp">
+                  刪除
+                </button>
+              </div>
+            </div>
+            <!-- 通用設定 -->
+            <div class="col-11 px-2" id="commonSetting">
+              <div class ="d-flex justify-content-center">
+                <h4 type="text" id="type" class="m-0"></h4>
+              </div>
+              <div class ="d-flex justify-content-between align-items-center my-3">
+                <div class ="d-inline-block mx-1">X 座標</div>
+                <input type="text" id="posX" class="form-control"/>
+              </div>
+              <div class ="d-flex justify-content-between align-items-center my-3">
+                <div class="d-inline-block mx-1">Y 座標</div>
+                <input type="text" id="posY" class="form-control"/>
+              </div>
+              <div class ="d-flex justify-content-between align-items-center my-3">
+                <div class="d-inline-block mx-1">寬度</div>
+                <input type="text" id="widgetW" class="form-control"/>
+              </div>
+              <div class ="d-flex justify-content-between align-items-center my-3">
+                <div class="d-inline-block mx-1">高度</div>
+                <input type="text" id="widgetH" class="form-control"/>
+              </div>
+            </div>
+            <!-- label、textField 設定 -->
+            <div class="col-11 px-2" id="textSetting">
+              <div class ="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-inline-block mx-1">文字字型</div>
+                <select id="fontType" class="selectField">
+                 <option value="MingLiU">細明體</option>
+                  <option value="標楷體">標楷體</option>
+                </select>
+              </div>
+              <div class ="d-flex justify-content-between align-items-center my-3">
+                <div class ="d-inline-block mx-1">文字大小</div>
+                <input type="text" id="fontSize" class="form-control"/>
+              </div>
+              <div class ="d-flex justify-content-between align-items-center my-3">
+                <div class ="d-inline-block mx-1">文字顏色</div>
+                <input type="text" id="fontColor" class="form-control"/>
+              </div>
+              <div class ="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-inline-block mx-1">文字粗體</div>
+                <select id="fontWeight" class="selectField">
+                  <option value="400">否</option>
+                  <option value="700">是</option>
+                </select>
+              </div>
+              <div class ="d-flex justify-content-between align-items-center my-3">
+                <div class ="d-inline-block mx-1">文字內容</div>
+                <textarea class="form-control" id="content" rows="3"></textarea>
+              </div>
+              <div class ="d-flex justify-content-between my-3">
+                <div class="d-inline-block mx-1">水平對齊</div>
+                <select id="hAlign" class="selectField">
+                  <option value="right">靠右</option>
+                  <option value="center">置中</option>
+                  <option value="left">靠左</option>
+                </select>
+              </div>
+              <div class ="d-flex justify-content-between my-3">
+                <div class="d-inline-block mx-1">垂直對齊</div>
+                <select id="vAlign" class="selectField">
+                  <option value="start">靠上</option>
+                  <option value="center">置中</option>
+                  <option value="end">靠下</option>
+                </select>
+              </div>
+              <div class ="d-flex align-items-center my-3">
+                <div class ="d-inline-block mx-1">邊框</div>
+              </div>
+              <div class ="d-flex mx-1 justify-content-between align-items-center">
+                <div class="w-auto me-2">
+                  
+                  <button type="button" class="btn btn-outline-primary btn-sm" id="allBorder">全選</button>
+                </div>
+                <div class="form-check form-check-inline m-1">
+                  <input class="form-check-input" type="checkbox" name="border" id="borderT" value="top">
+                  <label class="form-check-label" for="borderT">上</label>
+                </div>
+                <div class="form-check form-check-inline m-1">
+                  <input class="form-check-input" type="checkbox" name="border" id="borderB" value="bottom">
+                  <label class="form-check-label" for="borderB">下</label>
+                </div>
+                <div class="form-check form-check-inline m-1">
+                  <input class="form-check-input" type="checkbox" name="border" id="borderL" value="left">
+                  <label class="form-check-label" for="borderL">左</label>
+                </div>
+                <div class="form-check form-check-inline m-1">
+                  <input class="form-check-input" type="checkbox" name="border" id="borderR" value="right">
+                  <label class="form-check-label" for="borderR">右</label>
+                </div>
+              </div>
+              <div class="w-100 text-center my-3">
+                <button type="button" class="btn btn-dark d-inline-block mx-2" id="setTextTemp">
+                  套用
+                </button>
+                <button type="button" class="delete btn btn-outline-secondary d-inline-block mx-2">
+                  刪除
+                </button>
+              </div>
+            </div>
+            <!-- line 設定 -->
+            <div class="col-11 px-2" id="lineSetting">
+              <div class ="d-flex justify-content-between align-items-center">
+                <div class ="d-inline-block mx-1">顏色</div>
+                <input type="text" id="color" class="form-control"/>
+              </div>
+              <div class ="d-flex justify-content-between align-items-center my-3">
+                <div class="d-inline-block mx-1">樣式</div>
+                <select id="lineStyle" class="selectField">
+                  <option value="Solid">實線</option>
+                  <option value="Dashed">虛線</option>
+                </select>
+              </div>
+              <div class ="d-flex justify-content-between align-items-center my-3">
+                <div class="d-inline-block mx-1">直橫</div>
+                <select id="direction" class="selectField">
+                  <option value="rotateH">橫向</option>
+                  <option value="rotateV">直向</option>
+                </select>
+              </div>
+              <div class="w-100 text-center my-3">
+                <button type="button" class="btn btn-dark d-inline-block mx-2" id="setLineTemp">
+                  套用
+                </button>
+                <button type="button" class="delete btn btn-outline-secondary d-inline-block mx-2">
+                  刪除
+                </button>
+              </div>
+            </div>
+            <!-- rect 設定 -->
+            <div class="col-11 px-2" id="recSetting">
+              <div class ="d-flex justify-content-between align-items-center">
+                <div class ="d-inline-block mx-1">顏色</div>
+                <input type="text" id="recColor" class="form-control"/>
+              </div>
+              <div class="w-100 text-center my-3">
+                <button type="button" class="btn btn-dark d-inline-block mx-2" id="setRectTemp">
+                  套用
+                </button>
+                <button type="button" class="delete btn btn-outline-secondary d-inline-block mx-2">
+                  刪除
+                </button>
+              </div>
+            </div>
+            <!-- image 設定 -->
+            <div class="col-11 px-2" id="imageSetting">
+              <div class ="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-inline-block mx-1">檔案位置</div>
+                <select id="filePath" class="selectField">
+                  <option value=""></option>
+                  <option value=""></option>
+                </select>
+              </div>
+              <div class ="d-flex justify-content-between align-items-center my-3">
+                <div class="d-inline-block mx-1">影像比例</div>
+                <select id="fileRate" class="selectField">
+                  <option value="">FillFrame</option>
+                  <option value="">Clip</option>
+                  <option value="">RetainShape</option>
+                  <option value="">RealSize</option>
+                  <option value="">RealHeight</option>
+                </select>
+              </div>
+              <div class="w-100 text-center my-3">
+                <button type="button" class="btn btn-dark d-inline-block mx-2" id="setImageTemp">
+                  套用
+                </button>
+                <button type="button" class="delete btn btn-outline-secondary d-inline-block mx-2">
+                  刪除
+                </button>
+              </div>
+            </div>
+  
           </div>
         </div>
       </div>
     </div>
-    <div class="row justify-content-center align-content-center">
-      <div class="col-8 p-0 my-3">
-        <div class="row g-3 align-items-center">
-          <div class="col-auto">
-            <label class="col-form-label">寬度</label>
-          </div>
-          <div class="col-auto">
-            <input id="paperW" class="form-control">
-          </div>
-          <div class="col-auto">
-            <label class="col-form-label">高度</label>
-          </div>
-          <div class="col-auto">
-            <input id="paperH" class="form-control">
-          </div>
-          <div class="col-auto">
-            <label class="col-form-label">主資料來源</label>
-          </div>
-          <div class="col-auto">
-            <input id="mainDs" class="form-control">
-          </div>
-          <div class="col-auto">
-            <button type="button" class="btn btn-dark ms-2" id="setPaper">
-              套用
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row h-75">
-      <div class="col-2 h-100 ps-5">
-        <div class="">
-          <div class="template blocks" data-order="1">
-            <i class="fa-solid fa-inbox mx-2" style="color:blue"></i>
-            <p class="d-inline m-0">Title</p>
-          </div>
-          <div class="template blocks" data-order="4">
-            <i class="fa-solid fa-inbox mx-2" style="color:blue"></i>
-            <p class="d-inline m-0">Detail</p>
-          </div>
-          <div class="template blocks" data-order="7">
-            <i class="fa-solid fa-inbox mx-2" style="color:blue"></i>
-            <p class="d-inline m-0">Summary</p>
-          </div>
-          <div class="template blocks" data-order="2">
-            <i class="fa-solid fa-inbox mx-2" style="color:red"></i>
-            <p class="d-inline m-0">Page Header</p>
-          </div>
-          <div class="template blocks" data-order="6">
-            <i class="fa-solid fa-inbox mx-2" style="color:red"></i>
-            <p class="d-inline m-0">Page Footer</p>
-          </div>
-          <div class="template blocks" data-order="3">
-            <i class="fa-solid fa-inbox mx-2" style="color:green"></i>
-            <p class="d-inline m-0">Column Header</p>
-          </div>
-          <div class="template blocks" data-order="5">
-            <i class="fa-solid fa-inbox mx-2" style="color:green"></i>
-            <p class="d-inline m-0">Column Footer</p>
-          </div>
-        </div>
-        <div class="template widgets" id="label" data-type="Label">
-          <i class="fa-solid fa-pencil mx-2" style="color:orange"></i>
-          <p class="d-inline m-0">Label</p>
-        </div>
-        <div class="template widgets" id="textField" data-type="TextField">
-          <i class="fa-solid fa-font mx-2" style="color:orange"></i>
-          <p class="d-inline m-0">Text Field</p>
-        </div>
-        <div class="template widgets" id="line" data-type="Line">
-          <i class="fa-solid fa-grip-lines mx-2" style="color:orange"></i>
-          <p class="d-inline m-0">Line</p>
-        </div>
-        <div class="template widgets" id="rect" data-type="Rect">
-          <i class="fa-solid fa-vector-square mx-2" style="color:orange"></i>
-          <p class="d-inline m-0">Rect</p>
-        </div>
-        <div class="template widgets" id="image" data-type="Image">
-          <i class="fa-regular fa-image mx-2" style="color:orange"></i>
-          <p class="d-inline m-0">Image</p>
-        </div>
-      </div>
-      <div id="container" class="col-8 border border-secondary bg-dark bg-opacity-10 overflow-scroll">
-        <ul class="bg-white position-relative overflow-hidden" id="paper"></ul>
-      </div>
-      <div class="col-2 h-100">
-        <div class="row justify-content-center">
-          <!-- 容器高度設定 -->
-          <div class="col-11 p-0 my-3 text-center" id="setBlockHeight">
-            <div class ="d-flex justify-content-around align-items-center my-3">
-              <div class ="d-inline-block mx-1">高度</div>
-              <input type="text" id="tempH" class="form-control w-auto"/>
-            </div>
-            <div>
-              <button type="button" class="btn btn-dark d-inline-block mx-2" id="setTemp">
-                套用
-              </button>
-              <button type="button" class="btn btn-outline-secondary d-inline-block mx-2" id="deleteTemp">
-                刪除
-              </button>
-            </div>
-          </div>
-          <!-- 通用設定 -->
-          <div class="col-11 px-2" id="commonSetting">
-            <div class ="d-flex justify-content-center">
-              <h4 type="text" id="type" class="m-0"></h2>
-            </div>
-            <div class ="d-flex justify-content-between align-items-center my-3">
-              <div class ="d-inline-block mx-1">X 座標</div>
-              <input type="text" id="posX" class="form-control"/>
-            </div>
-            <div class ="d-flex justify-content-between align-items-center my-3">
-              <div class="d-inline-block mx-1">Y 座標</div>
-              <input type="text" id="posY" class="form-control"/>
-            </div>
-            <div class ="d-flex justify-content-between align-items-center my-3">
-              <div class="d-inline-block mx-1">寬度</div>
-              <input type="text" id="widgetW" class="form-control"/>
-            </div>
-            <div class ="d-flex justify-content-between align-items-center my-3">
-              <div class="d-inline-block mx-1">高度</div>
-              <input type="text" id="widgetH" class="form-control"/>
-            </div>
-          </div>
-          <!-- label、textField 設定 -->
-          <div class="col-11 px-2" id="textSetting">
-            <div class ="d-flex justify-content-between align-items-center mb-3">
-              <div class="d-inline-block mx-1">文字字型</div>
-              <select id="fontType" class="selectField">
-               <option value="MingLiU">細明體</option>
-                <option value="標楷體">標楷體</option>
-              </select>
-            </div>
-            <div class ="d-flex justify-content-between align-items-center my-3">
-              <div class ="d-inline-block mx-1">文字大小</div>
-              <input type="text" id="fontSize" class="form-control"/>
-            </div>
-            <div class ="d-flex justify-content-between align-items-center my-3">
-              <div class ="d-inline-block mx-1">文字顏色</div>
-              <input type="text" id="fontColor" class="form-control"/>
-            </div>
-            <div class ="d-flex justify-content-between align-items-center mb-3">
-              <div class="d-inline-block mx-1">文字粗體</div>
-              <select id="fontWeight" class="selectField">
-                <option value="400">否</option>
-                <option value="700">是</option>
-              </select>
-            </div>
-            <div class ="d-flex justify-content-between align-items-center my-3">
-              <div class ="d-inline-block mx-1">文字內容</div>
-              <textarea class="form-control" id="content" rows="3"></textarea>
-            </div>
-            <div class ="d-flex justify-content-between my-3">
-              <div class="d-inline-block mx-1">水平對齊</div>
-              <select id="hAlign" class="selectField">
-                <option value="right">靠右</option>
-                <option value="center">置中</option>
-                <option value="left">靠左</option>
-              </select>
-            </div>
-            <div class ="d-flex justify-content-between my-3">
-              <div class="d-inline-block mx-1">垂直對齊</div>
-              <select id="vAlign" class="selectField">
-                <option value="start">靠上</option>
-                <option value="center">置中</option>
-                <option value="end">靠下</option>
-              </select>
-            </div>
-            <div class ="d-flex align-items-center my-3">
-              <div class ="d-inline-block mx-1">邊框</div>
-            </div>
-            <div class ="d-flex mx-1 justify-content-between align-items-center">
-              <div class="w-auto me-2">
-                
-                <button type="button" class="btn btn-outline-primary btn-sm" id="allBorder">全選</button>
-              </div>
-              <div class="form-check form-check-inline m-1">
-                <input class="form-check-input" type="checkbox" name="border" id="borderT" value="top">
-                <label class="form-check-label" for="borderT">上</label>
-              </div>
-              <div class="form-check form-check-inline m-1">
-                <input class="form-check-input" type="checkbox" name="border" id="borderB" value="bottom">
-                <label class="form-check-label" for="borderB">下</label>
-              </div>
-              <div class="form-check form-check-inline m-1">
-                <input class="form-check-input" type="checkbox" name="border" id="borderL" value="left">
-                <label class="form-check-label" for="borderL">左</label>
-              </div>
-              <div class="form-check form-check-inline m-1">
-                <input class="form-check-input" type="checkbox" name="border" id="borderR" value="right">
-                <label class="form-check-label" for="borderR">右</label>
-              </div>
-            </div>
-            <div class="w-100 text-center my-3">
-              <button type="button" class="btn btn-dark d-inline-block mx-2" id="setTextTemp">
-                套用
-              </button>
-              <button type="button" class="delete btn btn-outline-secondary d-inline-block mx-2">
-                刪除
-              </button>
-            </div>
-          </div>
-          <!-- line 設定 -->
-          <div class="col-11 px-2" id="lineSetting">
-            <div class ="d-flex justify-content-between align-items-center">
-              <div class ="d-inline-block mx-1">顏色</div>
-              <input type="text" id="color" class="form-control"/>
-            </div>
-            <div class ="d-flex justify-content-between align-items-center my-3">
-              <div class="d-inline-block mx-1">樣式</div>
-              <select id="lineStyle" class="selectField">
-                <option value="Solid">實線</option>
-                <option value="Dashed">虛線</option>
-              </select>
-            </div>
-            <div class ="d-flex justify-content-between align-items-center my-3">
-              <div class="d-inline-block mx-1">直橫</div>
-              <select id="direction" class="selectField">
-                <option value="rotateH">橫向</option>
-                <option value="rotateV">直向</option>
-              </select>
-            </div>
-            <div class="w-100 text-center my-3">
-              <button type="button" class="btn btn-dark d-inline-block mx-2" id="setLineTemp">
-                套用
-              </button>
-              <button type="button" class="delete btn btn-outline-secondary d-inline-block mx-2">
-                刪除
-              </button>
-            </div>
-          </div>
-          <!-- rect 設定 -->
-          <div class="col-11 px-2" id="recSetting">
-            <div class ="d-flex justify-content-between align-items-center">
-              <div class ="d-inline-block mx-1">顏色</div>
-              <input type="text" id="recColor" class="form-control"/>
-            </div>
-            <div class="w-100 text-center my-3">
-              <button type="button" class="btn btn-dark d-inline-block mx-2" id="setRectTemp">
-                套用
-              </button>
-              <button type="button" class="delete btn btn-outline-secondary d-inline-block mx-2">
-                刪除
-              </button>
-            </div>
-          </div>
-          <!-- image 設定 -->
-          <div class="col-11 px-2" id="imageSetting">
-            <div class ="d-flex justify-content-between align-items-center mb-3">
-              <div class="d-inline-block mx-1">檔案位置</div>
-              <select id="filePath" class="selectField">
-                <option value=""></option>
-                <option value=""></option>
-              </select>
-            </div>
-            <div class ="d-flex justify-content-between align-items-center my-3">
-              <div class="d-inline-block mx-1">影像比例</div>
-              <select id="fileRate" class="selectField">
-                <option value="">FillFrame</option>
-                <option value="">Clip</option>
-                <option value="">RetainShape</option>
-                <option value="">RealSize</option>
-                <option value="">RealHeight</option>
-              </select>
-            </div>
-            <div class="w-100 text-center my-3">
-              <button type="button" class="btn btn-dark d-inline-block mx-2" id="setImageTemp">
-                套用
-              </button>
-              <button type="button" class="delete btn btn-outline-secondary d-inline-block mx-2">
-                刪除
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
+    
   </body>
 </html>
